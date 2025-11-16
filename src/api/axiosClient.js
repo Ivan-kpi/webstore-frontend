@@ -17,7 +17,6 @@ axiosClient.interceptors.request.use((config) => {
   return config;
 });
 
-// Якщо токен протухнув — викидаємо на логін
 axiosClient.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -30,5 +29,6 @@ axiosClient.interceptors.response.use(
 );
 
 export default axiosClient;
+
 
 
