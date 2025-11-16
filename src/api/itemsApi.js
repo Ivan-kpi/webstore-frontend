@@ -2,23 +2,23 @@ import axiosClient from "./axiosClient";
 
 const itemsApi = {
   getAll() {
-    return axiosClient.get("/api/items");
+    return axiosClient.get("/items");
   },
 
   get(id) {
-    return axiosClient.get(`/api/items/${id}`);
+    return axiosClient.get(`/items/${id}`);
   },
 
   create(item) {
-    return axiosClient.post("/api/items", { item });
+    return axiosClient.post("/items", { item });
   },
 
   update(id, item) {
-    return axiosClient.put(`/api/items/${id}`, { item });
+    return axiosClient.put(`/items/${id}`, { item });
   },
 
   delete(id) {
-    return axiosClient.delete(`/api/items/${id}`);
+    return axiosClient.delete(`/items/${id}`);
   }
 };
 

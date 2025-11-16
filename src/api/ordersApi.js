@@ -2,15 +2,15 @@ import axiosClient from "./axiosClient";
 
 const ordersApi = {
   getMyOrders() {
-    return axiosClient.get("/api/orders");
+    return axiosClient.get("/orders");
   },
 
   getOrder(id) {
-    return axiosClient.get(`/api/orders/${id}`);
+    return axiosClient.get(`/orders/${id}`);
   },
 
   createOrder(items) {
-    return axiosClient.post("/api/orders", { items });
+    return axiosClient.post("/orders", { items });
   }
 };
 
