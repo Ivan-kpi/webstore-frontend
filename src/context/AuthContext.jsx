@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect } from "react";
+import { createContext, useState, useEffect, useContext } from "react";
 import authApi from "../api/authApi";
 import axiosClient from "../api/axiosClient";
 
@@ -6,9 +6,9 @@ export const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true); // Поки не знаємо чи юзер залогінений
+  const [loading, setLoading] = useState(true);
 
-  // ========== LOAD USER ON APP START ==========
+  // Load user on startup
   useEffect(() => {
     const token = localStorage.getItem("token");
 
@@ -19,9 +19,7 @@ export function AuthProvider({ children }) {
 
     axiosClient
       .get("/me")
-      .then((res) => {
-        setUser(res.data);
-      })
+      .then((res) => setUser(res.data))
       .catch(() => {
         localStorage.removeItem("token");
         setUser(null);
@@ -29,28 +27,21 @@ export function AuthProvider({ children }) {
       .finally(() => setLoading(false));
   }, []);
 
-  // ========== LOGIN ==========
+  // ========= LOGIN =========
   const login = async (email, password) => {
-    const data = await authApi.login(email, password);
-
-    // Після логіну одразу вантажимо юзера
+    await authApi.login(email, password);
     const me = await axiosClient.get("/me");
-
     setUser(me.data);
-    return me.data;
   };
 
-  // ========== REGISTER ==========
+  // ========= REGISTER =========
   const register = async (first_name, last_name, email, password) => {
-    const data = await authApi.register(first_name, last_name, email, password);
-
+    await authApi.register(first_name, last_name, email, password);
     const me = await axiosClient.get("/me");
-
     setUser(me.data);
-    return me.data;
   };
 
-  // ========== LOGOUT ==========
+  // ========= LOGOUT =========
   const logout = async () => {
     try {
       await authApi.logout();
@@ -73,6 +64,11 @@ export function AuthProvider({ children }) {
       {!loading && children}
     </AuthContext.Provider>
   );
+}
+
+// ========= CUSTOM HOOK =========
+export function useAuth() {
+  return useContext(AuthContext);
 }
 
 
