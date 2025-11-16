@@ -12,13 +12,18 @@ axiosClient.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
 
   if (token) {
-    config.headers["Authorization"] = token;
+    // гарантуємо формат Bearer <token>
+    if (!token.startsWith("Bearer ")) {
+      config.headers["Authorization"] = `Bearer ${token}`;
+    } else {
+      config.headers["Authorization"] = token;
+    }
   }
 
   return config;
 });
 
-// Якщо токен протухнув — викидаємо на логін
+// Якщо токен прострочений — викидаємо
 axiosClient.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -31,3 +36,4 @@ axiosClient.interceptors.response.use(
 );
 
 export default axiosClient;
+
