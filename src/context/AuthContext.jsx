@@ -1,15 +1,14 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useState, useEffect } from "react";
 import authApi from "../api/authApi";
 import axiosClient from "../api/axiosClient";
 
-const AuthContext = createContext();
+export const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null); 
-  const [loading, setLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true); // Поки не знаємо чи юзер залогінений
 
-  // 🔥 Перевірка токена при завантаженні сторінки
+  // ========== LOAD USER ON APP START ==========
   useEffect(() => {
     const token = localStorage.getItem("token");
 
@@ -18,72 +17,62 @@ export function AuthProvider({ children }) {
       return;
     }
 
-    // ⚡ Отримуємо реального користувача через /api/me
     axiosClient
-      .get("/api/me")
-      .then(res => {
+      .get("/me")
+      .then((res) => {
         setUser(res.data);
-        setIsAuthenticated(true);
       })
       .catch(() => {
         localStorage.removeItem("token");
         setUser(null);
-        setIsAuthenticated(false);
       })
-      .finally(() => {
-        setLoading(false);
-      });
+      .finally(() => setLoading(false));
   }, []);
 
-  // 🔑 Login
+  // ========== LOGIN ==========
   const login = async (email, password) => {
     const data = await authApi.login(email, password);
 
-    setIsAuthenticated(true);
-    setUser(data.user);
+    // Після логіну одразу вантажимо юзера
+    const me = await axiosClient.get("/me");
 
-    return data;
+    setUser(me.data);
+    return me.data;
   };
 
-  // 🆕 Register
+  // ========== REGISTER ==========
   const register = async (first_name, last_name, email, password) => {
     const data = await authApi.register(first_name, last_name, email, password);
 
-    setIsAuthenticated(true);
-    setUser(data.user);
+    const me = await axiosClient.get("/me");
 
-    return data;
+    setUser(me.data);
+    return me.data;
   };
 
-  // 🚪 Logout
+  // ========== LOGOUT ==========
   const logout = async () => {
     try {
       await authApi.logout();
-    } catch (e) {}
-
+    } catch {}
     localStorage.removeItem("token");
     setUser(null);
-    setIsAuthenticated(false);
   };
 
   return (
     <AuthContext.Provider
       value={{
         user,
-        setUser,   // ⭐ ДОДАНО СЮДИ ⭐
-        isAuthenticated,
-        loading,
         login,
         register,
-        logout
+        logout,
+        loading,
+        isAuthenticated: !!user,
       }}
     >
-      {children}
+      {!loading && children}
     </AuthContext.Provider>
   );
 }
 
-export function useAuth() {
-  return useContext(AuthContext);
-}
 
