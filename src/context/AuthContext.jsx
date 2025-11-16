@@ -1,74 +1,55 @@
-import { createContext, useState, useEffect, useContext } from "react";
-import authApi from "../api/authApi";
 import axiosClient from "../api/axiosClient";
+import { createContext, useState, useEffect } from "react";
 
 export const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
 
-  // Load user on startup
+  // Автоматична перевірка токену при старті
   useEffect(() => {
     const token = localStorage.getItem("token");
 
-    if (!token) {
-      setLoading(false);
-      return;
+    if (token) {
+      axiosClient
+        .get("/me")
+        .then((res) => setUser(res.data))
+        .catch(() => {
+          localStorage.removeItem("token");
+        });
     }
-
-    axiosClient
-      .get("/me")
-      .then((res) => setUser(res.data))
-      .catch(() => {
-        localStorage.removeItem("token");
-        setUser(null);
-      })
-      .finally(() => setLoading(false));
   }, []);
 
-  // ========= LOGIN =========
+  // Логін
   const login = async (email, password) => {
-    await authApi.login(email, password);
+    const response = await axiosClient.post("/users/sign_in", {
+      user: { email, password },
+    });
+
+    localStorage.setItem("token", response.headers.authorization);
     const me = await axiosClient.get("/me");
     setUser(me.data);
   };
 
-  // ========= REGISTER =========
+  // Реєстрація
   const register = async (first_name, last_name, email, password) => {
-    await authApi.register(first_name, last_name, email, password);
-    const me = await axiosClient.get("/me");
-    setUser(me.data);
+    await axiosClient.post("/users", {
+      user: { first_name, last_name, email, password },
+    });
   };
 
-  // ========= LOGOUT =========
+  // Вихід
   const logout = async () => {
-    try {
-      await authApi.logout();
-    } catch {}
+    await axiosClient.delete("/users/sign_out");
     localStorage.removeItem("token");
     setUser(null);
   };
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        login,
-        register,
-        logout,
-        loading,
-        isAuthenticated: !!user,
-      }}
-    >
-      {!loading && children}
+    <AuthContext.Provider value={{ user, login, register, logout }}>
+      {children}
     </AuthContext.Provider>
   );
-}
-
-// ========= CUSTOM HOOK =========
-export function useAuth() {
-  return useContext(AuthContext);
 }
 
 
