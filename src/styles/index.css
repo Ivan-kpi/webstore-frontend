@@ -1,0 +1,84 @@
+/* ======= RESET / BASE ======= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #f4f4f4;
+  font-family: Arial, sans-serif;
+  color: #333;
+  line-height: 1.5;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+}
+
+/* ======= GLOBAL CONTAINERS ======= */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* ======= LOADING SPINNER ANIMATION ======= */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ======= TABLE DEFAULT STYLING ======= */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+th,
+td {
+  padding: 10px;
+  text-align: left;
+}
+
+th {
+  background: #eaeaea;
+  border-bottom: 2px solid #ccc;
+}
+
+tr:nth-child(even) {
+  background: #fafafa;
+}
+
+/* ======= FORM DEFAULTS ======= */
+input, select {
+  font-family: inherit;
+}
+
+/* ======= SCROLLBAR (OPTIONAL) ======= */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #ddd;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
