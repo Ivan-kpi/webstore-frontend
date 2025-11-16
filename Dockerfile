@@ -1,26 +1,23 @@
-# Use Node 20 (required for react-router v7)
 FROM node:20-slim
 
-# Create working directory
 WORKDIR /app
 
-# Copy package files first (better caching)
-COPY package*.json ./
+# 1. Приймаємо змінну від Railway під час білду
+ARG VITE_API_URL
+ENV VITE_API_URL=${VITE_API_URL}
 
-# Install dependencies (npm ci deliberately NOT used)
+COPY package*.json ./
 RUN npm install
 
-# Copy all app files
 COPY . .
 
-# Build React app
+# 2. Будуємо React із доступом до VITE_API_URL
 RUN npm run build
 
-# Install static server globally
+# 3. Простіше нікуди — serve для віддачі статичних файлів
 RUN npm install -g serve
-
-# Expose port (Railway will override automatically)
 EXPOSE 3000
 
-# Start production server
 CMD ["serve", "-s", "build", "-l", "3000"]
+
+
