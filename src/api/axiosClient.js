@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const axiosClient = axios.create({
-  baseURL: "http://localhost:3000", // Rails API
+  baseURL: import.meta.env.VITE_API_URL + "/api",
   headers: {
     "Content-Type": "application/json"
   }
